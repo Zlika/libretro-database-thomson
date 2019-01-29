@@ -1,4 +1,4 @@
-This folder includes cheat codes files and a content data for Thomson MO/TO games, to be used with RetroArch. It mimics the [libretro-database](https://github.com/libretro/libretro-database), but only includes content for Thomson MO/TO computers.
+This repository includes cheat codes files and a content data for Thomson MO/TO games, to be used with RetroArch. It mimics the [libretro-database](https://github.com/libretro/libretro-database), but only includes content for Thomson MO/TO computers.
 
 # RetroArch Database
 
@@ -9,7 +9,7 @@ RetroArch incoporates a ROM scanning system to automatically produce playlists. 
 - [`cht`](cht) Cheats to various games
 - [`dat`](dat) The DAT file for Thomson games
 - [`rdb`](rdb) The compiled RetroArch database file
-- [`scripts`](scripts) A script to generate the DAT file from the https://www.screenscraper.fr website's content
+- [`scripts`](scripts) Scripts to generate the DAT file and the thumbnails files from the https://www.screenscraper.fr website
 
 ## Sources
 

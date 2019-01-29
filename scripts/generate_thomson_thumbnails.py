@@ -15,6 +15,9 @@
 #
 # This script downloads thumbnails for Thomson games
 # from the ScreenScraper site.
+# To optimize the size of the Snap and Title images, use imagemagick
+# to reduce the number of colors to 256 with the following command:
+# mogrify -colors 256 -depth 8 *.png
 
 from collections import namedtuple, OrderedDict
 import datetime
