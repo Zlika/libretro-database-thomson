@@ -29,54 +29,68 @@ import urllib.request
 THOMSON_PLATFORMID = 141
 SCREENSCRAPER_URL = "https://www.screenscraper.fr/"
 SCREENSCRAPER_GAMESLIST_URL = SCREENSCRAPER_URL + "medias/" + str(THOMSON_PLATFORMID) + "/gameslist.csv"
-SCREENSCAPER_MEDIA_BASEURL=SCREENSCRAPER_URL + "image.php?gameid="
+SCREENSCAPER_MEDIA_BASEURL = SCREENSCRAPER_URL + "image.php?gameid="
+DOWNLOAD_MAX_RETRIES = 3
+
+
+# Download a URL in a file, with several retries if needed.
+def urlretrieve_with_retries(url, file):
+    for i in range(0, DOWNLOAD_MAX_RETRIES):
+        try:
+            urllib.request.urlretrieve(url, file)
+            return
+        except:
+            if i == DOWNLOAD_MAX_RETRIES - 1:
+                raise
 
 
 def checkPng(imgFile):
-	with open(imgFile, "rb") as f:
-		bytes = f.read(4)
-		if bytes != b'\x89PNG':
-			os.remove(imgFile)
+    with open(imgFile, "rb") as f:
+        bytes = f.read(4)
+        if bytes != b'\x89PNG':
+            os.remove(imgFile)
 
 
 def download_thumbnails(gameid, gamename):
-	print("Downloading media for " + gamename)
-	# Download Boxart
-	boxart = "../thumbnails/Named_Boxarts/" + gamename + ".png"
-	try:
-		urllib.request.urlretrieve(SCREENSCAPER_MEDIA_BASEURL + str(gameid) + "&media=box-2D&region=wor&maxwidth=512", boxart)
-		checkPng(boxart)
-	except:
-		print("Cannot find Boxart image for game " + gamename)
-	# Download Snap
-	snap = "../thumbnails/Named_Snaps/" + gamename + ".png"
-	try:
-		urllib.request.urlretrieve(SCREENSCAPER_MEDIA_BASEURL + str(gameid) + "&media=ss&region=wor&maxwidth=320", snap)
-		checkPng(snap)
-	except:
-		print("Cannot find Snap image for game " + gamename)
-	# Download Title
-	title = "../thumbnails/Named_Titles/" + gamename + ".png"
-	try:
-		urllib.request.urlretrieve(SCREENSCAPER_MEDIA_BASEURL + str(gameid) + "&media=sstitle&region=wor&maxwidth=320", title)
-		checkPng(title)
-	except:
-		print("Cannot find Title image for game " + gamename)
+    print("Downloading media for " + gamename)
+    # Download Boxart
+    boxart = "../thumbnails/Named_Boxarts/" + gamename + ".png"
+    try:
+        urlretrieve_with_retries(SCREENSCAPER_MEDIA_BASEURL + str(gameid) + "&media=box-2D&region=wor&maxwidth=512", boxart)
+        checkPng(boxart)
+    except:
+        print("Cannot find Boxart image for game " + gamename)
+    # Download Snap
+    snap = "../thumbnails/Named_Snaps/" + gamename + ".png"
+    try:
+        urlretrieve_with_retries(SCREENSCAPER_MEDIA_BASEURL + str(gameid) + "&media=ss&region=wor&maxwidth=320", snap)
+        checkPng(snap)
+    except:
+        print("Cannot find Snap image for game " + gamename)
+    # Download Title
+    title = "../thumbnails/Named_Titles/" + gamename + ".png"
+    try:
+        urlretrieve_with_retries(SCREENSCAPER_MEDIA_BASEURL + str(gameid) + "&media=sstitle&region=wor&maxwidth=320", title)
+        checkPng(title)
+    except:
+        print("Cannot find Title image for game " + gamename)
 
 
 def get_gameslist():
-	with urllib.request.urlopen(SCREENSCRAPER_GAMESLIST_URL) as response:
-		csvfile = response.read().decode('cp1252').replace('"', '')
-	lines = csvfile.splitlines()
-	gameslist = []
-	for i in range(1, len(lines)):
-		columns = lines[i].split(';')
-		gameslist.append([columns[0], columns[1]])
-	return gameslist
+    with urllib.request.urlopen(SCREENSCRAPER_GAMESLIST_URL) as response:
+        csvfile = response.read().decode('utf-8').replace('"', '')
+    lines = csvfile.splitlines()
+    gameslist = []
+    for i in range(1, len(lines)):
+        columns = lines[i].split(';')
+        gameslist.append([columns[0], columns[1]])
+    return gameslist
 
 
 if __name__ == "__main__":
-	gameslist = get_gameslist()
-	for game in gameslist:
-		download_thumbnails(game[0], game[1])
-
+    gameslist = get_gameslist()
+    os.makedirs("../thumbnails/Named_Boxarts/")
+    os.makedirs("../thumbnails/Named_Snaps/")
+    os.makedirs("../thumbnails/Named_Titles/")
+    for game in gameslist:
+        download_thumbnails(game[0], game[1])
